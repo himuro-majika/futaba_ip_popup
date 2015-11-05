@@ -65,7 +65,7 @@
 	setClassAndName();
 	setEvent();
 	setStyle();
-	
+
 	function setClassAndName(){
 		var atd = document.evaluate(
 			"/html/body/form/table/tbody/tr/td[@bgcolor]",
@@ -75,7 +75,7 @@
 			null);
 		for (var i = 0; i < atd.snapshotLength; i++) {
 			var td = atd.snapshotItem(i);
-			var id = new Array();
+			var id = [];
 			id[i] = td.textContent.match(/I[DP]:\S+/);
 			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/, "<a class='futaba_ip_popup_name' name='" + id[i] + "'>" + id[i]);
 			td.innerHTML = td.innerHTML.replace(" No.", "</a> No.");
@@ -101,7 +101,7 @@
 		var wX;	//ポップアップ表示位置X
 		var wY;	//ポップアップ表示位置Y
 		var tda = document.getElementsByName(this.name);
-		var restable = new Array();
+		var restable = [];
 		for (var i = 0; i < tda.length; i++) {
 			restable.push(tda[i].parentNode.parentNode.parentNode.innerHTML);
 		}
@@ -125,7 +125,7 @@
 	function hide() {
 		timer = setTimeout(delpop,250);
 	}
-	
+
 	function delpop() {
 		var doc_pop = document.getElementById("futaba_ip_popup_pop");
 		if ( doc_pop ) {
@@ -137,8 +137,8 @@
 	 * スタイル設定
 	 */
 	function setStyle(){
-		var css = "#futaba_ip_popup_pop { position: absolute; z-index: 100; background-color: #eeaa88; }" + 
-		"#futaba_ip_popup_pop > tbody > tr > td { color: #800000; font-size: 8pt !important; }" + 
+		var css = "#futaba_ip_popup_pop { position: absolute; z-index: 100; background-color: #eeaa88; }" +
+		"#futaba_ip_popup_pop > tbody > tr > td { color: #800000; font-size: 8pt !important; }" +
 		"#futaba_ip_popup_pop > tbody > tr > td > blockquote{ margin-top: 0px !important; argin-bottom: 0px !important; }" +
 		".futaba_ip_popup_name { color: #F00;}";
 		if (typeof GM_addStyle != "undefined") {
@@ -151,7 +151,7 @@
 				var node = document.createElement("style");
 				node.type = "text/css";
 				node.appendChild(document.createTextNode(css));
-				heads[0].appendChild(node); 
+				heads[0].appendChild(node);
 			}
 		}
 	}
