@@ -129,7 +129,7 @@
 	function delpop() {
 		var doc_pop = document.getElementById("futaba_ip_popup_pop");
 		if ( doc_pop ) {
-			document.body.removeChild(doc_pop);
+			doc_pop.parentNode.removeChild(doc_pop);
 		}
 	}
 
