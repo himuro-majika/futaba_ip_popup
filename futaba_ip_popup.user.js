@@ -2,6 +2,7 @@
 // @name           futaba ID+IP popup
 // @namespace      https://github.com/himuro-majika
 // @description    同じIDやIPのレスをポップアップしちゃう
+// @author         himuro_majika
 // @note           赤福の「続きを読む」機能で読み込んだレスには反応しません。
 // @note           適宜ページ全体をリロードしてください。
 // @include        http://may.2chan.net/b/res/*
@@ -52,21 +53,24 @@
 // @include        http://zip.2chan.net/6/res/*
 // @include        http://img.2chan.net/9/res/*
 // @include        http://www.2chan.net/junbi/res/*
-// @version     1.1
-// @grant       GM_addStyle
+// @version        1.1
+// @grant          GM_addStyle
+// @license        MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPUExURYv4i2PQYy2aLUe0R////zorx9oAAAAFdFJOU/////8A+7YOUwAAAElJREFUeNqUj1EOwDAIQoHn/c88bX+2fq0kRsAoUXVAfwzCttWsDWzw0kNVWd2tZ5K9gqmMZB8libt4pSg6YlO3RnTzyxePAAMAzqMDgTX8hYYAAAAASUVORK5CYII=
 // ==/UserScript==
 (function () {
 
 	var Start = new Date().getTime();//count parsing time
-	var saba = location.host.replace(".2chan.net","")+location.pathname.replace("futaba.htm","");
+	var saba = location.host.replace(".2chan.net","") +
+		location.pathname.replace("futaba.htm","");
 	var timer;
 
 	setClassAndName();
 	setEvent();
 	setStyle();
 
-	function setClassAndName(){
+	// ID/IPにclass,nameを設定する
+	function setClassAndName() {
 		var atd = document.evaluate(
 			"/html/body/form/table/tbody/tr/td[@bgcolor]",
 			document,
@@ -77,12 +81,13 @@
 			var td = atd.snapshotItem(i);
 			var id = [];
 			id[i] = td.textContent.match(/I[DP]:\S+/);
-			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/, "<a class='futaba_ip_popup_name' name='" + id[i] + "'>" + id[i]);
+			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/,
+				"<a class='futaba_ip_popup_name' name='" + id[i] + "'>" + id[i]);
 			td.innerHTML = td.innerHTML.replace(" No.", "</a> No.");
 		}
 	}
-
-	function setEvent(){
+	// イベントを設定
+	function setEvent() {
 		var aa = document.evaluate(
 			"//a[@class='futaba_ip_popup_name']",
 			document,
@@ -95,7 +100,7 @@
 			a.addEventListener("mouseout",hide,true);
 		}
 	}
-
+	// ポップアップを表示する
 	function show(event) {
 		delpop();
 		var wX;	//ポップアップ表示位置X
@@ -106,7 +111,7 @@
 			restable.push(tda[i].parentNode.parentNode.parentNode.innerHTML);
 		}
 		var table = document.createElement("table");
-		table.id = "futaba_ip_popup_pop";
+		table.id = "GM_fip_pop";
 		table.innerHTML = restable.join(" ");
 		table.addEventListener("mouseover",function(){
 			clearTimeout(timer);
@@ -121,26 +126,37 @@
 		}
 		table.setAttribute("style", "left:" + wX + "px; top:" + wY + "px;");
 	}
-
+	// ポップアップを消す
 	function hide() {
 		timer = setTimeout(delpop,250);
 	}
 
 	function delpop() {
-		var doc_pop = document.getElementById("futaba_ip_popup_pop");
+		var doc_pop = document.getElementById("GM_fip_pop");
 		if ( doc_pop ) {
 			doc_pop.parentNode.removeChild(doc_pop);
 		}
 	}
-
 	/*
 	 * スタイル設定
 	 */
-	function setStyle(){
-		var css = "#futaba_ip_popup_pop { position: absolute; z-index: 100; background-color: #eeaa88; }" +
-		"#futaba_ip_popup_pop > tbody > tr > td { color: #800000; font-size: 8pt !important; }" +
-		"#futaba_ip_popup_pop > tbody > tr > td > blockquote{ margin-top: 0px !important; argin-bottom: 0px !important; }" +
-		".futaba_ip_popup_name { color: #F00;}";
+	function setStyle() {
+		var css = "#GM_fip_pop {" +
+			"  position: absolute;" +
+			"  z-index: 100;" +
+			"  background-color: #eeaa88;"+
+			"}" +
+		"#GM_fip_pop > tbody > tr > td {" +
+			"  color: #800000;" +
+			"  font-size: 8pt !important;" +
+			"}" +
+		"#GM_fip_pop > tbody > tr > td > blockquote {" +
+			"  margin-top: 0px !important;" +
+			"  argin-bottom: 0px !important;" +
+			"}" +
+		".futaba_ip_popup_name {" +
+			"  color: #F00;" +
+			"}";
 		if (typeof GM_addStyle != "undefined") {
 			GM_addStyle(css);
 		} else if (typeof addStyle != "undefined") {
