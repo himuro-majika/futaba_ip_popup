@@ -19,7 +19,7 @@
 	var timer;
 
 	setClassAndName();
-	showCounter();
+	createCounter();
 	setEvent();
 	setStyle();
 
@@ -41,16 +41,23 @@
 		}
 	}
 	// 出現数の表示
-	function showCounter() {
+	function createCounter() {
 		var a = document.querySelectorAll(".GM_fip_name");
+		var ids = {};
 		for (var i = 0; i < a.length; i++) {
 			var node = a[i];
 			var id = node.name;
+			if (ids[id]) {
+				ids[id]++;
+			} else {
+				ids[id] = 1;
+			}
 			var name = document.querySelectorAll(".GM_fip_name[name='" + id + "']");
 			var span = document.createElement("span");
 			span.setAttribute("class", "GM_fip_counter");
-			span.textContent = "[" + name.length + "]";
-			node.parentNode.insertBefore(span, node.nextSibling);
+			span.textContent = "[" + ids[id] + "/" + name.length + "]";
+			// node.parentNode.insertBefore(span, node.nextSibling);
+			node.appendChild(span);
 		}
 	}
 	// イベントを設定
@@ -125,7 +132,7 @@
 			"  color: #F00;" +
 			"}" +
 		".GM_fip_counter {" +
-		  "  margin: 0 5px" +
+		  "  margin: 0 0.3em" +
 		"}";
 		if (typeof GM_addStyle != "undefined") {
 			GM_addStyle(css);
