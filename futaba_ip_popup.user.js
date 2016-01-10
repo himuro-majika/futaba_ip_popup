@@ -25,13 +25,17 @@
 
 	// ID/IPにclass,nameを設定する
 	function setClassAndName() {
-		var atd = document.getElementsByClassName("rtd");
-		for (var i = 0; i < atd.length; i++) {
-			var td = atd[i];
-			var id = td.textContent.match(/I[DP]:\S+/);
-			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/,
-				"<a class='GM_fip_name' name='" + id + "'>" + id);
-			td.innerHTML = td.innerHTML.replace(" No.", "</a> No.");
+		res();
+		// レス
+		function res() {
+			var atd = document.getElementsByClassName("rtd");
+			for (var i = 0; i < atd.length; i++) {
+				var td = atd[i];
+				td.innerHTML = td.innerHTML.replace(
+					/(I[DP]:\S+)/,
+					"<a class='GM_fip_name' name='$1'>$1</a>"
+				);
+			}
 		}
 	}
 	// 出現数の表示
