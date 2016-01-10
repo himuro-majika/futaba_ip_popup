@@ -19,6 +19,7 @@
 	var timer;
 
 	setClassAndName();
+	showCounter();
 	setEvent();
 	setStyle();
 
@@ -35,14 +36,27 @@
 			var id = [];
 			id[i] = td.textContent.match(/I[DP]:\S+/);
 			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/,
-				"<a class='futaba_ip_popup_name' name='" + id[i] + "'>" + id[i]);
+				"<a class='GM_fip_name' name='" + id[i] + "'>" + id[i]);
 			td.innerHTML = td.innerHTML.replace(" No.", "</a> No.");
+		}
+	}
+	// 出現数の表示
+	function showCounter() {
+		var a = document.querySelectorAll(".GM_fip_name");
+		for (var i = 0; i < a.length; i++) {
+			var node = a[i];
+			var id = node.name;
+			var name = document.querySelectorAll(".GM_fip_name[name='" + id + "']");
+			var span = document.createElement("span");
+			span.setAttribute("class", "GM_fip_counter");
+			span.textContent = "[" + name.length + "]";
+			node.parentNode.insertBefore(span, node.nextSibling);
 		}
 	}
 	// イベントを設定
 	function setEvent() {
 		var aa = document.evaluate(
-			"//a[@class='futaba_ip_popup_name']",
+			"//a[@class='GM_fip_name']",
 			document,
 			null,
 			XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
@@ -107,9 +121,12 @@
 			"  margin-top: 0px !important;" +
 			"  argin-bottom: 0px !important;" +
 			"}" +
-		".futaba_ip_popup_name {" +
+		".GM_fip_name {" +
 			"  color: #F00;" +
-			"}";
+			"}" +
+		".GM_fip_counter {" +
+		  "  margin: 0 5px" +
+		"}";
 		if (typeof GM_addStyle != "undefined") {
 			GM_addStyle(css);
 		} else if (typeof addStyle != "undefined") {
