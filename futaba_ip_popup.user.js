@@ -25,24 +25,18 @@
 
 	// ID/IPにclass,nameを設定する
 	function setClassAndName() {
-		var atd = document.evaluate(
-			"/html/body/form/table/tbody/tr/td[@bgcolor]",
-			document,
-			null,
-			XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-			null);
-		for (var i = 0; i < atd.snapshotLength; i++) {
-			var td = atd.snapshotItem(i);
-			var id = [];
-			id[i] = td.textContent.match(/I[DP]:\S+/);
+		var atd = document.getElementsByClassName("rtd");
+		for (var i = 0; i < atd.length; i++) {
+			var td = atd[i];
+			var id = td.textContent.match(/I[DP]:\S+/);
 			td.innerHTML = td.innerHTML.replace(/I[DP]:\S+/,
-				"<a class='GM_fip_name' name='" + id[i] + "'>" + id[i]);
+				"<a class='GM_fip_name' name='" + id + "'>" + id);
 			td.innerHTML = td.innerHTML.replace(" No.", "</a> No.");
 		}
 	}
 	// 出現数の表示
 	function createCounter() {
-		var a = document.querySelectorAll(".GM_fip_name");
+		var a = document.getElementsByClassName("GM_fip_name");
 		var ids = {};
 		for (var i = 0; i < a.length; i++) {
 			var node = a[i];
@@ -62,14 +56,9 @@
 	}
 	// イベントを設定
 	function setEvent() {
-		var aa = document.evaluate(
-			"//a[@class='GM_fip_name']",
-			document,
-			null,
-			XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-			null);
-		for (var i = 0; i < aa.snapshotLength; i++) {
-			var a = aa.snapshotItem(i);
+		var aa = document.getElementsByClassName("GM_fip_name");
+		for (var i = 0; i < aa.length; i++) {
+			var a = aa[i];
 			a.addEventListener("mouseover",show,true);
 			a.addEventListener("mouseout",hide,true);
 		}
