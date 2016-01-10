@@ -5,54 +5,7 @@
 // @author         himuro_majika
 // @note           赤福の「続きを読む」機能で読み込んだレスには反応しません。
 // @note           適宜ページ全体をリロードしてください。
-// @include        http://may.2chan.net/b/res/*
-// @include        http://img.2chan.net/b/res/*
-// @include        http://may.2chan.net/id/res/*
-// @include        http://dec.2chan.net/53/res/*
-// @include        http://dec.2chan.net/52/res/*
-// @include        http://zip.2chan.net/1/res/*
-// @include        http://zip.2chan.net/12/res/*
-// @include        http://may.2chan.net/27/res/*
-// @include        http://up.2chan.net/d/res/*
-// @include        http://up.2chan.net/t/res/*
-// @include        http://dat.2chan.net/21/res/*
-// @include        http://up.2chan.net/e/res/*
-// @include        http://up.2chan.net/j/res/*
-// @include        http://nov.2chan.net/37/res/*
-// @include        http://dat.2chan.net/45/res/*
-// @include        http://up.2chan.net/r/res/*
-// @include        http://jun.2chan.net/b/res/*
-// @include        http://may.2chan.net/b/res/*
-// @include        http://may.2chan.net/id/res/*
-// @include        http://dat.2chan.net/23/res/*
-// @include        http://jun.2chan.net/31/res/*
-// @include        http://nov.2chan.net/28/res/*
-// @include        http://zip.2chan.net/11/res/*
-// @include        http://zip.2chan.net/14/res/*
-// @include        http://zip.2chan.net/32/res/*
-// @include        http://zip.2chan.net/8/res/*
-// @include        http://jun.2chan.net/51/res/*
-// @include        http://zip.2chan.net/5/res/*
-// @include        http://zip.2chan.net/3/res/*
-// @include        http://cgi.2chan.net/g/res/*
-// @include        http://zip.2chan.net/2/res/*
-// @include        http://dat.2chan.net/44/res/*
-// @include        http://up.2chan.net/v/res/*
-// @include        http://nov.2chan.net/y/res/*
-// @include        http://dat.2chan.net/46/res/*
-// @include        http://dat.2chan.net/22/res/*
-// @include        http://up.2chan.net/x/res/*
-// @include        http://nov.2chan.net/35/res/*
-// @include        http://dec.2chan.net/50/res/*
-// @include        http://dat.2chan.net/38/res/*
-// @include        http://cgi.2chan.net/f/res/*
-// @include        http://may.2chan.net/39/res/*
-// @include        http://cgi.2chan.net/k/res/*
-// @include        http://dat.2chan.net/l/res/*
-// @include        http://may.2chan.net/40/res/*
-// @include        http://zip.2chan.net/6/res/*
-// @include        http://img.2chan.net/9/res/*
-// @include        http://www.2chan.net/junbi/res/*
+// @include        http://*.2chan.net/*/res/*.htm
 // @version        1.1
 // @grant          GM_addStyle
 // @license        MIT
@@ -143,7 +96,7 @@
 	function setStyle() {
 		var css = "#GM_fip_pop {" +
 			"  position: absolute;" +
-			"  z-index: 100;" +
+			"  z-index: 500;" +
 			"  background-color: #eeaa88;"+
 			"}" +
 		"#GM_fip_pop > tbody > tr > td {" +
