@@ -16,7 +16,7 @@
 	var Start = new Date().getTime();//count parsing time
 	var saba = location.host.replace(".2chan.net","") +
 		location.pathname.replace("futaba.htm","");
-	var timer;
+	var timer_show, timer_hide;
 
 	setClassAndName();
 	createCounter();
@@ -63,39 +63,47 @@
 		var aa = document.getElementsByClassName("GM_fip_name");
 		for (var i = 0; i < aa.length; i++) {
 			var a = aa[i];
-			a.addEventListener("mouseover",show,true);
-			a.addEventListener("mouseout",hide,true);
+			a.addEventListener("mouseover", show, true);
+			a.addEventListener("mouseout", hide, true);
 		}
 	}
 	// ポップアップを表示する
 	function show(event) {
+		clearTimeout(timer_show);
 		delpop();
-		var wX;	//ポップアップ表示位置X
-		var wY;	//ポップアップ表示位置Y
-		var tda = document.getElementsByName(this.name);
-		var restable = [];
-		for (var i = 0; i < tda.length; i++) {
-			restable.push(tda[i].parentNode.parentNode.parentNode.innerHTML);
-		}
-		var table = document.createElement("table");
-		table.id = "GM_fip_pop";
-		table.innerHTML = restable.join(" ");
-		table.addEventListener("mouseover",function(){
-			clearTimeout(timer);
-		},true);
-		table.addEventListener("mouseout",hide,true);
-		var body = document.getElementsByTagName("body");
-		body[0].appendChild(table);
-		wX = event.clientX;
-		wY = window.scrollY + event.clientY - table.clientHeight;
-		if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
-			wY = window.scrollY + event.clientY;
-		}
-		table.setAttribute("style", "left:" + wX + "px; top:" + wY + "px;");
+		var name = this.name;
+		timer_show = setTimeout(function() {
+			var wX;	//ポップアップ表示位置X
+			var wY;	//ポップアップ表示位置Y
+			var popup = document.createElement("table");
+			var tda = document.getElementsByName(name);
+			for (var i = 0; i < tda.length; i++) {
+				// restable.push(tda[i].parentNode.parentNode.parentNode.innerHTML);
+				var table = tda[i].parentNode.parentNode.parentNode.cloneNode(true);
+				popup.appendChild(table);
+			}
+			var restable = [];
+			console.dir(restable);
+			popup.id = "GM_fip_pop";
+			// popup.innerHTML = restable.join(" ");
+			popup.addEventListener("mouseover",function(){
+				clearTimeout(timer_hide);
+			},true);
+			popup.addEventListener("mouseout",hide,true);
+			var body = document.getElementsByTagName("body");
+			body[0].appendChild(popup);
+			wX = event.clientX + 10;
+			wY = window.scrollY + event.clientY - popup.clientHeight - 10;
+			if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
+				wY = window.scrollY + event.clientY;
+			}
+			popup.setAttribute("style", "left:" + wX + "px; top:" + wY + "px;");
+		}, 300);
 	}
 	// ポップアップを消す
 	function hide() {
-		timer = setTimeout(delpop,250);
+		clearTimeout(timer_show);
+		timer_hide = setTimeout(delpop, 300);
 	}
 
 	function delpop() {
@@ -110,7 +118,7 @@
 	function setStyle() {
 		var css = "#GM_fip_pop {" +
 			"  position: absolute;" +
-			"  z-index: 500;" +
+			"  z-index: 350;" +
 			"  background-color: #eeaa88;"+
 			"}" +
 		"#GM_fip_pop > tbody > tr > td {" +
