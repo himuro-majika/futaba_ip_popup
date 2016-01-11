@@ -18,24 +18,80 @@
 		location.pathname.replace("futaba.htm","");
 	var timer_show, timer_hide;
 
-	setClassAndName();
+	setClassAndNameThread();
+	setClassAndNameRes();
 	createCounter();
 	setEvent();
 	setStyle();
+	// observeInserted();
 
 	// ID/IPにclass,nameを設定する
-	function setClassAndName() {
-		res();
-		// レス
-		function res() {
-			var atd = document.getElementsByClassName("rtd");
-			for (var i = 0; i < atd.length; i++) {
-				var td = atd[i];
-				td.innerHTML = td.innerHTML.replace(
-					/(I[DP]:\S+)/,
-					"<a class='GM_fip_name' name='$1'>$1</a>"
-				);
+	// 本文
+	function setClassAndNameThread() {
+		// var Start = new Date().getTime();//count parsing time
+		var form = document.querySelector("html > body > form:not([enctype])");
+
+		// console.dir(form.childNodes);
+		for (var i = 0; i < form.childNodes.length; i++) {
+			var text = form.childNodes[i];
+			// console.dir(text);
+			if (text.nodeValue) {
+				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)(.*)/);
+				if (matchText) {
+					var date = document.createTextNode(matchText[1]);
+					var id = matchText[2];
+					var no = document.createTextNode(matchText[3]);
+					var ida = document.createElement("a");
+					ida.textContent = id;
+					ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
+					ida.setAttribute("name", id);
+					text.parentNode.insertBefore(date, text);
+					text.parentNode.insertBefore(ida, text);
+					text.parentNode.insertBefore(no, text);
+					text.parentNode.removeChild(text);
+					break;
+				}
 			}
+		}
+
+		// form.innerHTML = form.innerHTML.replace(
+		// 	/(I[DP]:\S+)/,
+		// 	"<a class='GM_fip_name GM_fip_name_thread' name='$1'>$1</a>"
+		// );
+
+		// console.log('Parsing '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
+	}
+	// レス
+	function setClassAndNameRes() {
+		var atd = document.getElementsByClassName("rtd");
+		for (var i = 0; i < atd.length; i++) {
+			var td = atd[i];
+
+			for (var j = 0; j < td.childNodes.length; j++) {
+				var text = td.childNodes[j];
+				if (text.nodeValue) {
+					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)(.*)/);
+					if (matchText) {
+						var date = document.createTextNode(matchText[1]);
+						var id = matchText[2];
+						var no = document.createTextNode(matchText[3]);
+						var ida = document.createElement("a");
+						ida.textContent = id;
+						ida.setAttribute("class", "GM_fip_name");
+						ida.setAttribute("name", id);
+						text.parentNode.insertBefore(date, text);
+						text.parentNode.insertBefore(ida, text);
+						text.parentNode.insertBefore(no, text);
+						text.parentNode.removeChild(text);
+						break;
+					}
+				}
+			}
+
+			// td.innerHTML = td.innerHTML.replace(
+			// 	/(I[DP]:\S+)/,
+			// 	"<a class='GM_fip_name' name='$1'>$1</a>"
+			// );
 		}
 	}
 	// 出現数の表示
@@ -75,15 +131,28 @@
 		timer_show = setTimeout(function() {
 			var wX;	//ポップアップ表示位置X
 			var wY;	//ポップアップ表示位置Y
-			var popup = document.createElement("table");
+			var popup = document.createElement("div");
 			var tda = document.getElementsByName(name);
 			for (var i = 0; i < tda.length; i++) {
-				// restable.push(tda[i].parentNode.parentNode.parentNode.innerHTML);
-				var table = tda[i].parentNode.parentNode.parentNode.cloneNode(true);
+				var table;
+				if (tda[i].classList.contains("GM_fip_name_thread")) {
+					// スレ
+					table = document.createElement("form");
+					var form = tda[i].parentNode.cloneNode(true);
+					// console.log(table.childNodes());
+					for (var j = 0; j < form.childNodes.length; j++) {
+						table.appendChild(form.childNodes[j].cloneNode(true));
+						if (form.childNodes[j].tagName == "BLOCKQUOTE") {
+							break;
+						}
+					}
+				} else {
+					// レス
+					table = tda[i].parentNode.parentNode.parentNode.parentNode.cloneNode(true);
+				}
 				popup.appendChild(table);
 			}
 			var restable = [];
-			console.dir(restable);
 			popup.id = "GM_fip_pop";
 			// popup.innerHTML = restable.join(" ");
 			popup.addEventListener("mouseover",function(){
@@ -117,23 +186,28 @@
 	 */
 	function setStyle() {
 		var css = "#GM_fip_pop {" +
-			"  position: absolute;" +
-			"  z-index: 350;" +
-			"  background-color: #eeaa88;"+
-			"}" +
-		"#GM_fip_pop > tbody > tr > td {" +
-			"  color: #800000;" +
-			"  font-size: 8pt !important;" +
-			"}" +
-		"#GM_fip_pop > tbody > tr > td > blockquote {" +
-			"  margin-top: 0px !important;" +
-			"  argin-bottom: 0px !important;" +
-			"}" +
+		"  position: absolute;" +
+		"  z-index: 350;" +
+		"  background-color: #eeaa88;"+
+		"}" +
+		// "#GM_fip_pop > form {" +
+		// "  background-color: #ffe" +
+		// "}" +
+		"#GM_fip_pop > form," +
+		"#GM_fip_pop > table > tbody > tr > td {" +
+		"  color: #800000;" +
+		"  font-size: 8pt !important;" +
+		"}" +
+		"#GM_fip_pop > form," +
+		"#GM_fip_pop > table > tbody > tr > td > blockquote {" +
+		"  margin-top: 0px !important;" +
+		"  argin-bottom: 0px !important;" +
+		"}" +
 		".GM_fip_name {" +
-			"  color: #F00;" +
-			"}" +
+		"  color: #F00;" +
+		"}" +
 		".GM_fip_counter {" +
-		  "  margin: 0 0.3em" +
+		"  margin: 0 0.3em" +
 		"}";
 		if (typeof GM_addStyle != "undefined") {
 			GM_addStyle(css);
