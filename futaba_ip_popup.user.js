@@ -167,12 +167,12 @@
 				wY = window.scrollY + event.clientY;
 			}
 			popup.setAttribute("style", "left:" + wX + "px; top:" + wY + "px;");
-		}, 300);
+		}, 200);
 	}
 	// ポップアップを消す
 	function hide() {
 		clearTimeout(timer_show);
-		timer_hide = setTimeout(delpop, 300);
+		timer_hide = setTimeout(delpop, 200);
 	}
 
 	function delpop() {
