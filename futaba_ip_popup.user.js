@@ -132,25 +132,28 @@
 			var wX;	//ポップアップ表示位置X
 			var wY;	//ポップアップ表示位置Y
 			var popup = document.createElement("div");
+			var divThread = document.createElement("div");
+			var table = document.createElement("table");
+			var tbody = document.createElement("tbody");
+			popup.appendChild(divThread);
+			popup.appendChild(table);
+			table.appendChild(tbody);
 			var tda = document.getElementsByName(name);
 			for (var i = 0; i < tda.length; i++) {
-				var table;
 				if (tda[i].classList.contains("GM_fip_name_thread")) {
 					// スレ
-					table = document.createElement("form");
 					var form = tda[i].parentNode.cloneNode(true);
-					// console.log(table.childNodes());
 					for (var j = 0; j < form.childNodes.length; j++) {
-						table.appendChild(form.childNodes[j].cloneNode(true));
+						divThread.appendChild(form.childNodes[j].cloneNode(true));
 						if (form.childNodes[j].tagName == "BLOCKQUOTE") {
 							break;
 						}
 					}
 				} else {
 					// レス
-					table = tda[i].parentNode.parentNode.parentNode.parentNode.cloneNode(true);
+					var tr = tda[i].parentNode.parentNode.cloneNode(true);
+					tbody.appendChild(tr);
 				}
-				popup.appendChild(table);
 			}
 			var restable = [];
 			popup.id = "GM_fip_pop";
@@ -193,15 +196,18 @@
 		// "#GM_fip_pop > form {" +
 		// "  background-color: #ffe" +
 		// "}" +
-		"#GM_fip_pop > form," +
+		"#GM_fip_pop > table {" +
+		"  clear: both;" +
+		"}" +
+		"#GM_fip_pop > div," +
 		"#GM_fip_pop > table > tbody > tr > td {" +
 		"  color: #800000;" +
 		"  font-size: 8pt !important;" +
 		"}" +
-		"#GM_fip_pop > form," +
+		"#GM_fip_pop > div," +
 		"#GM_fip_pop > table > tbody > tr > td > blockquote {" +
 		"  margin-top: 0px !important;" +
-		"  argin-bottom: 0px !important;" +
+		"  margin-bottom: 0px !important;" +
 		"}" +
 		".GM_fip_name {" +
 		"  color: #F00;" +
@@ -222,6 +228,27 @@
 				heads[0].appendChild(node);
 			}
 		}
+	}
+	// 続きを読むで追加されるレスを監視
+	function observeInserted() {
+		var target = document.querySelector("html > body > form[action]:not([enctype])");
+		var observer = new MutationObserver(function(mutations) {
+			mutations.forEach(function(mutation) {
+				var nodes = mutation.addedNodes;
+				for (var i = 0; i < nodes.length; i++) {
+					console.log(nodes[i]);
+					delpop();
+					if (nodes[i].tagName == "TABLE") {
+						console.log("!!!!!!!!!!");
+						setClassAndNameThread();
+						setClassAndNameThread();
+						createCounter();
+						setEvent();
+					}
+				}
+			});
+		});
+		observer.observe(target, { childList: true });
 	}
 
 	console.log('Parsing '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
