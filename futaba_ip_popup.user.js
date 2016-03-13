@@ -8,35 +8,55 @@
 // @include        http://*.2chan.net/*/res/*.htm
 // @version        1.1
 // @grant          GM_addStyle
+// @run-at      document-idle
 // @license        MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPUExURYv4i2PQYy2aLUe0R////zorx9oAAAAFdFJOU/////8A+7YOUwAAAElJREFUeNqUj1EOwDAIQoHn/c88bX+2fq0kRsAoUXVAfwzCttWsDWzw0kNVWd2tZ5K9gqmMZB8libt4pSg6YlO3RnTzyxePAAMAzqMDgTX8hYYAAAAASUVORK5CYII=
 // ==/UserScript==
 (function () {
+	var USE_COUNTER = true;	// IDカウンターを表示する
+	// USE_COUNTER = false;
+	var USE_COUNTER_CURRENT = true;	// IDカウンターに現在の出現数を表示
+	// USE_COUNTER_CURRENT = false;
 
 	var Start = new Date().getTime();//count parsing time
 	var saba = location.host.replace(".2chan.net","") +
 		location.pathname.replace("futaba.htm","");
 	var timer_show, timer_hide;
+	var isIDIPThread = checkThreadMail();
 
 	setClassAndNameThread();
+	console.log('Parsing thread '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setClassAndNameRes();
-	createCounter();
+	console.log('Parsing res '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
+	if (USE_COUNTER) {
+		createCounter();
+	}
+	console.log('Parsing counter '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setEvent();
+	console.log('Parsing set event '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setStyle();
-	// observeInserted();
+	console.log('Parsing set style '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
+	observeInserted();
 
+	// ID表示・IP表示スレかどうか
+	function checkThreadMail() {
+		var mail = document.querySelector("html > body > form > font > b > a");
+		if (mail && mail.href.match(/^mailto:i[dp]/i)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
-		// var Start = new Date().getTime();//count parsing time
 		var form = document.querySelector("html > body > form:not([enctype])");
-
-		// console.dir(form.childNodes);
 		for (var i = 0; i < form.childNodes.length; i++) {
 			var text = form.childNodes[i];
-			// console.dir(text);
-			if (text.nodeValue) {
-				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)(.*)/);
+			if (text.tagName == "BLOCKQUOTE") {
+				break;
+			} else if (text.nodeValue) {
+				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S{8})(.*)/);
 				if (matchText) {
 					var date = document.createTextNode(matchText[1]);
 					var id = matchText[2];
@@ -53,24 +73,21 @@
 				}
 			}
 		}
-
-		// form.innerHTML = form.innerHTML.replace(
-		// 	/(I[DP]:\S+)/,
-		// 	"<a class='GM_fip_name GM_fip_name_thread' name='$1'>$1</a>"
-		// );
-
-		// console.log('Parsing '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	}
 	// レス
-	function setClassAndNameRes() {
+	function setClassAndNameRes(node) {
 		var atd = document.getElementsByClassName("rtd");
+		if (arguments.length) {
+			atd = node;
+		}
 		for (var i = 0; i < atd.length; i++) {
 			var td = atd[i];
-
 			for (var j = 0; j < td.childNodes.length; j++) {
 				var text = td.childNodes[j];
-				if (text.nodeValue) {
-					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)(.*)/);
+				if (text.tagName == "BLOCKQUOTE") {
+					break;
+				} else if (text.nodeValue) {
+					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S{8})(.*)/);
 					if (matchText) {
 						var date = document.createTextNode(matchText[1]);
 						var id = matchText[2];
@@ -87,32 +104,46 @@
 					}
 				}
 			}
-
-			// td.innerHTML = td.innerHTML.replace(
-			// 	/(I[DP]:\S+)/,
-			// 	"<a class='GM_fip_name' name='$1'>$1</a>"
-			// );
 		}
 	}
 	// 出現数の表示
 	function createCounter() {
+		// return;
+		var start_counter = new Date().getTime();//count parsing time
 		var a = document.getElementsByClassName("GM_fip_name");
 		var ids = {};
 		for (var i = 0; i < a.length; i++) {
 			var node = a[i];
 			var id = node.name;
-			if (ids[id]) {
-				ids[id]++;
-			} else {
-				ids[id] = 1;
+			if (USE_COUNTER_CURRENT) {
+				if (ids[id]) {
+					ids[id]++;
+				} else {
+					ids[id] = 1;
+				}
 			}
-			var name = document.querySelectorAll(".GM_fip_name[name='" + id + "']");
-			var span = document.createElement("span");
-			span.setAttribute("class", "GM_fip_counter");
-			span.textContent = "[" + ids[id] + "/" + name.length + "]";
-			// node.parentNode.insertBefore(span, node.nextSibling);
-			node.appendChild(span);
+			// var name = document.querySelectorAll(".GM_fip_name[name='" + id + "']");
+			var name = document.getElementsByName(id);
+			var span;
+			if (node.childNodes[1]) {
+			// if (node.nextSibling.tagName == "SPAN") {
+				// console.log(node.childNodes.length);
+				// node.removeChild(node.childNodes[1]);
+				span = node.childNodes[1];
+				// span = node.nextSibling;
+			} else {
+				span = document.createElement("span");
+				node.appendChild(span);
+				// node.parentNode.insertBefore(span, node.nextSibling);
+				span.setAttribute("class", "GM_fip_counter");
+			}
+			if (USE_COUNTER_CURRENT) {
+				span.textContent = "[" + ids[id] + "/" + name.length + "]";
+			} else {
+				span.textContent = "[" + name.length + "]";
+			}
 		}
+		console.log('counter '+saba+': '+((new Date()).getTime()-start_counter) +'msec');//log parsing time
 	}
 	// イベントを設定
 	function setEvent() {
@@ -132,6 +163,7 @@
 			var wX;	//ポップアップ表示位置X
 			var wY;	//ポップアップ表示位置Y
 			var popup = document.createElement("div");
+			popup.setAttribute("style", "visibility: hidden;");
 			var divThread = document.createElement("div");
 			var table = document.createElement("table");
 			var tbody = document.createElement("tbody");
@@ -144,7 +176,10 @@
 					// スレ
 					var form = tda[i].parentNode.cloneNode(true);
 					for (var j = 0; j < form.childNodes.length; j++) {
-						divThread.appendChild(form.childNodes[j].cloneNode(true));
+						// 広告
+						if (form.childNodes[j].className !== "tue") {
+							divThread.appendChild(form.childNodes[j].cloneNode(true));
+						}
 						if (form.childNodes[j].tagName == "BLOCKQUOTE") {
 							break;
 						}
@@ -157,63 +192,77 @@
 			}
 			var restable = [];
 			popup.id = "GM_fip_pop";
+			popup.setAttribute("class", "GM_fip_pop akahuku_reply_popup");
+			popup.setAttribute("__akahuku_reply_popup_index", "");
 			// popup.innerHTML = restable.join(" ");
-			popup.addEventListener("mouseover",function(){
+			popup.addEventListener("mouseover",function() {
 				clearTimeout(timer_hide);
-			},true);
+			}, true);
 			popup.addEventListener("mouseout",hide,true);
 			var body = document.getElementsByTagName("body");
 			body[0].appendChild(popup);
 			wX = event.clientX + 10;
+			console.log("clientHeight: " + popup.clientHeight);
+			console.log("offsetHeight: " + popup.offsetHeight);
+			console.log("clientY: " + event.clientY);
+			console.log("scrollY: " + window.scrollY);
 			wY = window.scrollY + event.clientY - popup.clientHeight - 10;
+			console.log("wy: " + wY);
 			if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
 				wY = window.scrollY + event.clientY;
 			}
-			popup.setAttribute("style", "left:" + wX + "px; top:" + wY + "px;");
-		}, 200);
+			popup.setAttribute("style",
+				"left:" + wX + "px; top:" + wY + "px; visibility: visible;");
+		}, 100);
 	}
 	// ポップアップを消す
 	function hide() {
 		clearTimeout(timer_show);
-		timer_hide = setTimeout(delpop, 200);
+		clearTimeout(timer_hide);
+		timer_hide = setTimeout(delpop, 500);
 	}
 
 	function delpop() {
-		var doc_pop = document.getElementById("GM_fip_pop");
+		clearTimeout(timer_hide);
+		var doc_pop = document.getElementsByClassName("GM_fip_pop");
 		if ( doc_pop ) {
-			doc_pop.parentNode.removeChild(doc_pop);
+			for (var i = 0; i < doc_pop.length; i++) {
+				doc_pop[i].parentNode.removeChild(doc_pop[i]);
+			}
 		}
 	}
 	/*
 	 * スタイル設定
 	 */
 	function setStyle() {
-		var css = "#GM_fip_pop {" +
+		var css = ".GM_fip_pop {" +
 		"  position: absolute;" +
 		"  z-index: 350;" +
-		"  background-color: #eeaa88;"+
+		"  background-color: #eeaa88 !important;"+
 		"}" +
-		// "#GM_fip_pop > form {" +
+		// ".GM_fip_pop > form {" +
 		// "  background-color: #ffe" +
 		// "}" +
-		"#GM_fip_pop > table {" +
+		".GM_fip_pop > table {" +
 		"  clear: both;" +
 		"}" +
-		"#GM_fip_pop > div," +
-		"#GM_fip_pop > table > tbody > tr > td {" +
+		".GM_fip_pop > div," +
+		".GM_fip_pop > table > tbody > tr > td {" +
 		"  color: #800000;" +
 		"  font-size: 8pt !important;" +
 		"}" +
-		"#GM_fip_pop > div," +
-		"#GM_fip_pop > table > tbody > tr > td > blockquote {" +
+		".GM_fip_pop > div," +
+		".GM_fip_pop > table > tbody > tr > td > blockquote {" +
 		"  margin-top: 0px !important;" +
 		"  margin-bottom: 0px !important;" +
 		"}" +
 		".GM_fip_name {" +
 		"  color: #F00;" +
+		// "  font-family: monospace;" +
 		"}" +
 		".GM_fip_counter {" +
-		"  margin: 0 0.3em" +
+		"  margin: 0 0.3em;" +
+		// "  color: #cc1105;" +
 		"}";
 		if (typeof GM_addStyle != "undefined") {
 			GM_addStyle(css);
@@ -231,26 +280,50 @@
 	}
 	// 続きを読むで追加されるレスを監視
 	function observeInserted() {
+		observeReloadStatus();
 		var target = document.querySelector("html > body > form[action]:not([enctype])");
+		var timer_reload;
 		var observer = new MutationObserver(function(mutations) {
 			mutations.forEach(function(mutation) {
+				delpop();
 				var nodes = mutation.addedNodes;
 				for (var i = 0; i < nodes.length; i++) {
-					console.log(nodes[i]);
-					delpop();
-					if (nodes[i].tagName == "TABLE") {
-						console.log("!!!!!!!!!!");
-						setClassAndNameThread();
-						setClassAndNameThread();
-						createCounter();
-						setEvent();
+					// console.log(nodes[i]);
+					if (
+						nodes[i].tagName == "TABLE" &&
+						nodes[i].id !== "akahuku_bottom_container"
+					) {
+						if (isIDIPThread) {
+							setClassAndNameRes(nodes[i].childNodes[0].childNodes[0].childNodes);
+						}
+						clearTimeout(timer_reload);
+						timer_reload = setTimeout(rel, 50);
 					}
 				}
 			});
 		});
 		observer.observe(target, { childList: true });
+		function rel() {
+			if (!isIDIPThread) {
+				setClassAndNameThread();
+				setClassAndNameRes();
+			}
+			createCounter();
+			setEvent();
+		}
 	}
-
+	// 赤福のリロード状態を監視
+	function observeReloadStatus() {
+		var target = document.getElementById("akahuku_reload_status");
+		if (!target) {
+			return;
+		}
+		var observer = new MutationObserver(function(mutations) {
+			mutations.forEach(function(mutation) {
+				delpop();
+			});
+		});
+		observer.observe(target, { childList: true });
+	}
 	console.log('Parsing '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
-
 })();
