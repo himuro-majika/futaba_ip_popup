@@ -25,17 +25,12 @@
 	var isIDIPThread = checkThreadMail();
 
 	setClassAndNameThread();
-	console.log('Parsing thread '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setClassAndNameRes();
-	console.log('Parsing res '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	if (USE_COUNTER) {
 		createCounter();
 	}
-	console.log('Parsing counter '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setEvent();
-	console.log('Parsing set event '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	setStyle();
-	console.log('Parsing set style '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 	observeInserted();
 
 	// ID表示・IP表示スレかどうか
@@ -111,7 +106,6 @@
 	// 出現数の表示
 	function createCounter() {
 		// return;
-		var start_counter = new Date().getTime();//count parsing time
 		var a = document.getElementsByClassName("GM_fip_name");
 		var ids = {};
 		for (var i = 0; i < a.length; i++) {
@@ -145,7 +139,6 @@
 				span.textContent = "[" + name.length + "]";
 			}
 		}
-		console.log('counter '+saba+': '+((new Date()).getTime()-start_counter) +'msec');//log parsing time
 	}
 	// イベントを設定
 	function setEvent() {
@@ -204,12 +197,7 @@
 			var body = document.getElementsByTagName("body");
 			body[0].appendChild(popup);
 			wX = event.clientX + 10;
-			console.log("clientHeight: " + popup.clientHeight);
-			console.log("offsetHeight: " + popup.offsetHeight);
-			console.log("clientY: " + event.clientY);
-			console.log("scrollY: " + window.scrollY);
 			wY = window.scrollY + event.clientY - popup.clientHeight - 10;
-			console.log("wy: " + wY);
 			if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
 				wY = window.scrollY + event.clientY;
 			}
