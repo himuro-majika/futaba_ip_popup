@@ -50,7 +50,9 @@
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
-		var form = document.querySelector("html > body > form:not([enctype])");
+		var form = document.querySelector(".thre")
+			? document.querySelector(".thre")
+			: document.querySelector("html > body > form:not([enctype])");
 		for (var i = 0; i < form.childNodes.length; i++) {
 			var text = form.childNodes[i];
 			if (text.tagName == "BLOCKQUOTE") {
