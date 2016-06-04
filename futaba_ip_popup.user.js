@@ -6,7 +6,7 @@
 // @note           赤福の「続きを読む」機能で読み込んだレスには反応しません。
 // @note           適宜ページ全体をリロードしてください。
 // @include        http://*.2chan.net/*/res/*.htm
-// @version        1.1
+// @version        1.2
 // @grant          GM_addStyle
 // @run-at      document-idle
 // @license        MIT
