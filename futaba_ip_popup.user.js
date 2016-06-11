@@ -4,7 +4,7 @@
 // @description    同じIDやIPのレスをポップアップしちゃう
 // @author         himuro_majika
 // @include        http://*.2chan.net/*/res/*.htm
-// @version        1.2
+// @version        1.2.1
 // @grant          GM_addStyle
 // @run-at      document-idle
 // @license        MIT
