@@ -269,7 +269,9 @@
 	// 続きを読むで追加されるレスを監視
 	function observeInserted() {
 		observeReloadStatus();
-		var target = document.querySelector("html > body > form[action]:not([enctype])");
+		var target = document.querySelector(".thre") ?
+			document.querySelector(".thre") :
+			document.querySelector("html > body > form[action]:not([enctype])");
 		var timer_reload;
 		var observer = new MutationObserver(function(mutations) {
 			mutations.forEach(function(mutation) {
