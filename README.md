@@ -8,6 +8,8 @@ Chromeの場合、[Tampermonkey](https://chrome.google.com/webstore/detail/tampe
 Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)を先にインスールしてからスクリプトをインストールして下さい  
 
 ## 更新履歴
+* v1.2.2 2016-11-13
+	- https対応
 * v1.2.1 2016-06-11
 	- レイアウト変更に伴う修正
 * v1.2 2016-06-04
