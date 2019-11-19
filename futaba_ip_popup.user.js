@@ -44,6 +44,25 @@
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
+		var idnode = document.querySelector(".cnw");
+		if (idnode) {
+			var matchText = idnode.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);
+			if (matchText) {
+				var date = document.createTextNode(matchText[1]);
+				var id = matchText[2];
+				var no = document.createTextNode(matchText[3]);
+				var ida = document.createElement("a");
+				ida.textContent = id;
+				ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
+				ida.setAttribute("name", id);
+				idnode.innerText = ""
+				idnode.insertBefore(date, text);
+				idnode.insertBefore(ida, text);
+				idnode.insertBefore(no, text);
+				// idnode.parentNode.removeChild(text);
+			}
+			return;
+		}
 		var form = document.querySelector(".thre") ?
 			document.querySelector(".thre") :
 			document.querySelector("html > body > form:not([enctype])");
@@ -51,7 +70,8 @@
 			var text = form.childNodes[i];
 			if (text.tagName == "BLOCKQUOTE") {
 				break;
-			} else if (text.nodeValue) {
+			}
+			if (text.nodeValue) {
 				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S{8})(.*)/);
 				if (matchText) {
 					var date = document.createTextNode(matchText[1]);
@@ -69,9 +89,32 @@
 				}
 			}
 		}
+		function insertStyle() {
+
+		}
 	}
 	// レス
 	function setClassAndNameRes(node) {
+		var resIdNode = document.querySelectorAll(".rtd .cnw");
+		if(resIdNode.length) {
+			resIdNode.forEach(function(item) {
+				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);
+				if (matchText) {
+					var date = document.createTextNode(matchText[1]);
+					var id = matchText[2];
+					var no = document.createTextNode(matchText[3]);
+					var ida = document.createElement("a");
+					ida.textContent = id;
+					ida.setAttribute("class", "GM_fip_name");
+					ida.setAttribute("name", id);
+					item.innerText = ""
+					item.insertBefore(date, text);
+					item.insertBefore(ida, text);
+					item.insertBefore(no, text);
+				}
+			})
+			return
+		}
 		var atd = document.getElementsByClassName("rtd");
 		if (arguments.length) {
 			atd = node;
@@ -168,7 +211,12 @@
 			for (var i = 0; i < tda.length; i++) {
 				if (tda[i].classList.contains("GM_fip_name_thread")) {
 					// スレ
-					var form = tda[i].parentNode.cloneNode(true);
+					var form;
+					if (document.querySelector(".cnw")) {
+						form = tda[i].parentNode.parentNode.cloneNode(true);
+					} else {
+						form = tda[i].parentNode.cloneNode(true);
+					}
 					for (var j = 0; j < form.childNodes.length; j++) {
 						// 広告
 						if (form.childNodes[j].className !== "tue") {
@@ -180,7 +228,12 @@
 					}
 				} else {
 					// レス
-					var tr = tda[i].parentNode.parentNode.cloneNode(true);
+					var tr;
+					if (document.querySelector(".cnw")) {
+						tr =  tda[i].parentNode.parentNode.parentNode.cloneNode(true);
+					} else {
+						tr = tda[i].parentNode.parentNode.cloneNode(true);
+					}
 					tbody.appendChild(tr);
 				}
 			}
