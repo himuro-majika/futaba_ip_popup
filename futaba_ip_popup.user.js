@@ -5,7 +5,7 @@
 // @author         himuro_majika
 // @include        http://*.2chan.net/*/res/*.htm
 // @include        https://*.2chan.net/*/res/*.htm
-// @version        1.2.2
+// @version        1.2.3
 // @grant          GM_addStyle
 // @run-at      document-idle
 // @license        MIT
@@ -34,7 +34,10 @@
 
 	// ID表示・IP表示スレかどうか
 	function checkThreadMail() {
-		var mail = document.querySelector("html > body > form > font > b > a");
+		var mail = document.querySelector("html > body > form font > b > a");
+		if(document.querySelector(".cnm")) {
+			mail = document.querySelector(".cnm a")
+		}
 		if (mail && mail.href.match(/^mailto:i[dp]/i)) {
 			return true;
 		} else {
