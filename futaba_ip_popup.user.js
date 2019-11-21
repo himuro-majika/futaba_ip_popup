@@ -5,7 +5,7 @@
 // @author         himuro_majika
 // @include        http://*.2chan.net/*/res/*.htm
 // @include        https://*.2chan.net/*/res/*.htm
-// @version        1.2.3
+// @version        1.2.4
 // @grant          GM_addStyle
 // @run-at      document-idle
 // @license        MIT
@@ -99,6 +99,11 @@
 	// レス
 	function setClassAndNameRes(node) {
 		var resIdNode = document.querySelectorAll(".rtd .cnw");
+		if (arguments.length) {
+			node.forEach(function(item){
+				resIdNode = item.querySelectorAll(".rtd .cnw");
+			});
+		}
 		if(resIdNode.length) {
 			resIdNode.forEach(function(item) {
 				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);

@@ -9,6 +9,8 @@ Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/det
 
 ## 更新履歴
 * v1.2.3 2019-11-20
+	- 赤福の続きを読むでの問題を修正
+* v1.2.3 2019-11-20
 	- レイアウト変更に伴う修正
 * v1.2.2 2016-11-13
 	- https対応
