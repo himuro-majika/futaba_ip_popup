@@ -99,6 +99,11 @@
 	// レス
 	function setClassAndNameRes(node) {
 		var resIdNode = document.querySelectorAll(".rtd .cnw");
+		if (arguments.length) {
+			node.forEach(function(item){
+				resIdNode = item.querySelectorAll(".rtd .cnw");
+			});
+		}
 		if(resIdNode.length) {
 			resIdNode.forEach(function(item) {
 				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);
