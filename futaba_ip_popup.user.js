@@ -47,21 +47,19 @@
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
-		var idnode = document.querySelector(".cnw");
-		if (idnode) {
-			var matchText = idnode.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);
-			if (matchText) {
-				var date = document.createTextNode(matchText[1]);
-				var id = matchText[2];
-				var no = document.createTextNode(matchText[3]);
-				var ida = document.createElement("a");
-				ida.textContent = id;
-				ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
-				ida.setAttribute("name", id);
-				idnode.innerText = ""
-				idnode.insertBefore(date, text);
-				idnode.insertBefore(ida, text);
-				idnode.insertBefore(no, text);
+		var cnw = document.querySelector(".cnw");
+		if (cnw) {    //新レイアウト
+			var cnw_matchText = cnw.innerText.match(/(.+)(I[DP]:\S{8})/);
+			if (cnw_matchText) {
+				var cnw_date = document.createTextNode(cnw_matchText[1]);
+				var cnw_id = cnw_matchText[2];
+				var cnw_ida = document.createElement("a");
+				cnw_ida.textContent = cnw_id;
+				cnw_ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
+				cnw_ida.setAttribute("name", cnw_id);
+				cnw.textContent = ""
+				cnw.appendChild(cnw_date);
+				cnw.appendChild(cnw_ida);
 				// idnode.parentNode.removeChild(text);
 			}
 			return;
@@ -92,9 +90,6 @@
 				}
 			}
 		}
-		function insertStyle() {
-
-		}
 	}
 	// レス
 	function setClassAndNameRes(node) {
@@ -104,21 +99,19 @@
 				resIdNode = item.querySelectorAll(".rtd .cnw");
 			});
 		}
-		if(resIdNode.length) {
+		if(resIdNode.length) {    //新レイアウト
 			resIdNode.forEach(function(item) {
-				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})(.*)/);
+				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})/);
 				if (matchText) {
 					var date = document.createTextNode(matchText[1]);
 					var id = matchText[2];
-					var no = document.createTextNode(matchText[3]);
 					var ida = document.createElement("a");
 					ida.textContent = id;
 					ida.setAttribute("class", "GM_fip_name");
 					ida.setAttribute("name", id);
 					item.innerText = ""
-					item.insertBefore(date, text);
-					item.insertBefore(ida, text);
-					item.insertBefore(no, text);
+					item.appendChild(date);
+					item.appendChild(ida);
 				}
 			})
 			return
