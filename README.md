@@ -8,7 +8,9 @@ Chromeの場合、[Tampermonkey](https://chrome.google.com/webstore/detail/tampe
 Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)を先にインスールしてからスクリプトをインストールして下さい  
 
 ## 更新履歴
-* v1.2.3 2019-11-20
+* v1.2.5 2019-11-23
+	- カウンターが増殖する問題を修正
+* v1.2.4 2019-11-20
 	- 赤福の続きを読むでの問題を修正
 * v1.2.3 2019-11-20
 	- レイアウト変更に伴う修正
