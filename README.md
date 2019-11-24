@@ -8,6 +8,8 @@ Chromeの場合、[Tampermonkey](https://chrome.google.com/webstore/detail/tampe
 Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)を先にインスールしてからスクリプトをインストールして下さい  
 
 ## 更新履歴
+* v1.2.6 2019-11-24
+	- IP表示スレの問題を修正
 * v1.2.5 2019-11-23
 	- カウンターが増殖する問題を修正
 * v1.2.4 2019-11-20
