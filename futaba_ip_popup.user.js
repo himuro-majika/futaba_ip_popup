@@ -44,12 +44,20 @@
 			return false;
 		}
 	}
+
+	// setTimeout(function() {
+	// 		setClassAndNameThread();
+	// 		setClassAndNameRes();
+	// 	createCounter();
+	// 	setEvent();
+	// }, 1000)
+
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
-		var cnw = document.querySelector(".cnw");
+		var cnw = document.querySelector(".thre .cnw");
 		if (cnw) {    //新レイアウト
-			var cnw_matchText = cnw.innerText.match(/(.+)(I[DP]:\S{8})/);
+			var cnw_matchText = cnw.firstChild.nodeValue.match(/(.+)(I[DP]:\S+)/);
 			if (cnw_matchText) {
 				var cnw_date = document.createTextNode(cnw_matchText[1]);
 				var cnw_id = cnw_matchText[2];
@@ -73,7 +81,7 @@
 				break;
 			}
 			if (text.nodeValue) {
-				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S{8})(.*)/);
+				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)( No\.\d+)/);
 				if (matchText) {
 					var date = document.createTextNode(matchText[1]);
 					var id = matchText[2];
@@ -101,7 +109,7 @@
 		}
 		if(resIdNode.length) {    //新レイアウト
 			resIdNode.forEach(function(item) {
-				var matchText = item.innerText.match(/(.+)(I[DP]:\S{8})/);
+				var matchText = item.firstChild.nodeValue.match(/(.+)(I[DP]:\S+)/);
 				if (matchText) {
 					var date = document.createTextNode(matchText[1]);
 					var id = matchText[2];
@@ -127,7 +135,7 @@
 				if (text.tagName == "BLOCKQUOTE") {
 					break;
 				} else if (text.nodeValue) {
-					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S{8})(.*)/);
+					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)( No\.\d+)/);
 					if (matchText) {
 						var date = document.createTextNode(matchText[1]);
 						var id = matchText[2];
