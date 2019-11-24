@@ -5,7 +5,7 @@
 // @author         himuro_majika
 // @include        http://*.2chan.net/*/res/*.htm
 // @include        https://*.2chan.net/*/res/*.htm
-// @version        1.2.5
+// @version        1.2.6
 // @grant          GM_addStyle
 // @run-at      document-idle
 // @license        MIT
