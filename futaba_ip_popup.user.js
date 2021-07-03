@@ -6,7 +6,6 @@
 // @include        http://*.2chan.net/*/res/*.htm
 // @include        https://*.2chan.net/*/res/*.htm
 // @version        1.2.6
-// @run-at      document-idle
 // @license        MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPUExURYv4i2PQYy2aLUe0R////zorx9oAAAAFdFJOU/////8A+7YOUwAAAElJREFUeNqUj1EOwDAIQoHn/c88bX+2fq0kRsAoUXVAfwzCttWsDWzw0kNVWd2tZ5K9gqmMZB8libt4pSg6YlO3RnTzyxePAAMAzqMDgTX8hYYAAAAASUVORK5CYII=
 // ==/UserScript==
@@ -142,6 +141,7 @@
 					} else {
 						tr = tda[i].parentNode.parentNode.cloneNode(true);
 					}
+					setQtJump(tr);
 					tbody.appendChild(tr);
 				}
 			}
@@ -160,6 +160,18 @@
 			popup.style.top = wY + "px";
 			popup.style.left = wX + "px";
 		}, 100);
+		//ポップアップ内レス番号クリックでジャンプ
+		function setQtJump(qt) {
+			let rsc = qt.querySelector(".rsc");
+			rsc.classList.add("qtjmp");
+			let jumpid = rsc.id;
+			rsc.removeAttribute("id");
+			rsc.addEventListener("click", () => {
+				let jumptarget = document.getElementById(jumpid).parentNode;
+				window.scroll(0, jumptarget.getBoundingClientRect().top + window.pageYOffset);
+				delPopup();
+			});
+		}
 	}
 
 	function makePopupContainer() {
