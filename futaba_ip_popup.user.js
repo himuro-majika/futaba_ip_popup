@@ -5,163 +5,92 @@
 // @author         himuro_majika
 // @include        http://*.2chan.net/*/res/*.htm
 // @include        https://*.2chan.net/*/res/*.htm
-// @version        1.2.6
-// @grant          GM_addStyle
-// @run-at      document-idle
+// @version        1.3.0
 // @license        MIT
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPUExURYv4i2PQYy2aLUe0R////zorx9oAAAAFdFJOU/////8A+7YOUwAAAElJREFUeNqUj1EOwDAIQoHn/c88bX+2fq0kRsAoUXVAfwzCttWsDWzw0kNVWd2tZ5K9gqmMZB8libt4pSg6YlO3RnTzyxePAAMAzqMDgTX8hYYAAAAASUVORK5CYII=
 // ==/UserScript==
-(function () {
-	var USE_COUNTER = true;	// IDカウンターを表示する
-	// USE_COUNTER = false;
-	var USE_COUNTER_CURRENT = true;	// IDカウンターに現在の出現数を表示
-	// USE_COUNTER_CURRENT = false;
+(function() {
+	'use strict';
 
-	var Start = new Date().getTime();//count parsing time
-	var saba = location.host.replace(".2chan.net","") +
-		location.pathname.replace("futaba.htm","");
-	var timer_show, timer_hide;
-	var isIDIPThread = checkThreadMail();
+	const USE_COUNTER = true;	// IDカウンターを表示する
+	const USE_COUNTER_CURRENT = true;	// IDカウンターに現在の出現数を表示
+	const scriptName = "GM_FIP";
 
-	setClassAndNameThread();
-	setClassAndNameRes();
-	if (USE_COUNTER) {
+	let Start = new Date().getTime();//count parsing time
+	let saba = location.host.replace(".2chan.net","") + location.pathname.replace("futaba.htm","");
+	let timer_show, timer_hide;
+	let isIDIPThread = false;
+	let isImg = false;
+
+	init();
+	console.log(scriptName + " Parsing " + saba + ": " + ((new Date()).getTime() - Start) + "msec");//log parsing time
+
+	function init() {
+		checkIsImg();
+		checkThreadMail();
+		setClassAndNameThread();
 		createCounter();
+		observeInserted();
 	}
-	setEvent();
-	setStyle();
-	observeInserted();
+
+	//img鯖
+	function checkIsImg() {
+		isImg = document.querySelector(".cnm") === null;
+	}
 
 	// ID表示・IP表示スレかどうか
 	function checkThreadMail() {
-		var mail = document.querySelector("html > body > form font > b > a");
-		if(document.querySelector(".cnm")) {
-			mail = document.querySelector(".cnm a")
-		}
-		if (mail && mail.href.match(/^mailto:i[dp]/i)) {
-			return true;
-		} else {
-			return false;
-		}
+		let mail = !isImg ? document.querySelector(".cnm a") : document.querySelector(".thre .cnw a");
+		isIDIPThread = mail !== null && mail.href.match(/^mailto:i[dp]/i) !== null;
 	}
-
-	// setTimeout(function() {
-	// 		setClassAndNameThread();
-	// 		setClassAndNameRes();
-	// 	createCounter();
-	// 	setEvent();
-	// }, 1000)
 
 	// ID/IPにclass,nameを設定する
 	// 本文
 	function setClassAndNameThread() {
-		var cnw = document.querySelector(".thre .cnw");
-		if (cnw) {    //新レイアウト
-			var cnw_matchText = cnw.firstChild.nodeValue.match(/(.+)(I[DP]:\S+)/);
-			if (cnw_matchText) {
-				var cnw_date = document.createTextNode(cnw_matchText[1]);
-				var cnw_id = cnw_matchText[2];
-				var cnw_ida = document.createElement("a");
-				cnw_ida.textContent = cnw_id;
-				cnw_ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
-				cnw_ida.setAttribute("name", cnw_id);
-				cnw.textContent = ""
-				cnw.appendChild(cnw_date);
-				cnw.appendChild(cnw_ida);
-				// idnode.parentNode.removeChild(text);
-			}
-			return;
-		}
-		var form = document.querySelector(".thre") ?
-			document.querySelector(".thre") :
-			document.querySelector("html > body > form:not([enctype])");
-		for (var i = 0; i < form.childNodes.length; i++) {
-			var text = form.childNodes[i];
-			if (text.tagName == "BLOCKQUOTE") {
-				break;
-			}
-			if (text.nodeValue) {
-				var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)( No\.\d+)/);
-				if (matchText) {
-					var date = document.createTextNode(matchText[1]);
-					var id = matchText[2];
-					var no = document.createTextNode(matchText[3]);
-					var ida = document.createElement("a");
-					ida.textContent = id;
-					ida.setAttribute("class", "GM_fip_name GM_fip_name_thread");
-					ida.setAttribute("name", id);
-					text.parentNode.insertBefore(date, text);
-					text.parentNode.insertBefore(ida, text);
-					text.parentNode.insertBefore(no, text);
-					text.parentNode.removeChild(text);
-					break;
-				}
-			}
-		}
+		let cnw = document.querySelectorAll(".thre .cnw");
+		if (!cnw) return;
+		setClassAndName(cnw);
 	}
 	// レス
 	function setClassAndNameRes(node) {
-		var resIdNode = document.querySelectorAll(".rtd .cnw");
-		if (arguments.length) {
-			node.forEach(function(item){
-				resIdNode = item.querySelectorAll(".rtd .cnw");
-			});
-		}
-		if(resIdNode.length) {    //新レイアウト
-			resIdNode.forEach(function(item) {
-				var matchText = item.firstChild.nodeValue.match(/(.+)(I[DP]:\S+)/);
-				if (matchText) {
-					var date = document.createTextNode(matchText[1]);
-					var id = matchText[2];
-					var ida = document.createElement("a");
-					ida.textContent = id;
-					ida.setAttribute("class", "GM_fip_name");
-					ida.setAttribute("name", id);
-					item.innerText = ""
-					item.appendChild(date);
-					item.appendChild(ida);
-				}
-			})
-			return
-		}
-		var atd = document.getElementsByClassName("rtd");
-		if (arguments.length) {
-			atd = node;
-		}
-		for (var i = 0; i < atd.length; i++) {
-			var td = atd[i];
-			for (var j = 0; j < td.childNodes.length; j++) {
-				var text = td.childNodes[j];
-				if (text.tagName == "BLOCKQUOTE") {
-					break;
-				} else if (text.nodeValue) {
-					var matchText = text.nodeValue.match(/(.+)(I[DP]:\S+)( No\.\d+)/);
-					if (matchText) {
-						var date = document.createTextNode(matchText[1]);
-						var id = matchText[2];
-						var no = document.createTextNode(matchText[3]);
-						var ida = document.createElement("a");
-						ida.textContent = id;
-						ida.setAttribute("class", "GM_fip_name");
-						ida.setAttribute("name", id);
-						text.parentNode.insertBefore(date, text);
-						text.parentNode.insertBefore(ida, text);
-						text.parentNode.insertBefore(no, text);
-						text.parentNode.removeChild(text);
-						break;
-					}
-				}
+		let resIdNode = arguments.length ? node.querySelectorAll(".rtd .cnw") : document.querySelectorAll(".rtd .cnw");
+		if (!resIdNode) return;
+		setClassAndName(resIdNode);
+	}
+
+	function setClassAndName(node) {
+		if(!node.length) return;
+
+		node.forEach((item) => {
+			let matchText = item.textContent.match(/(.+)(I[DP]:\S+)/);
+			if (!matchText) return;
+			let dateEle = document.createTextNode(matchText[1]);
+			let mailEle = item.querySelector("a");
+			let idText = matchText[2];
+			let idEle = document.createElement("a");
+			idEle.textContent = idText;
+			idEle.classList.add("GM_fip_name");
+			idEle.setAttribute("name", idText);
+			idEle.style.color = "#F00";
+			idEle.addEventListener("mouseover", openPopup, true);
+			idEle.addEventListener("mouseout", closePopup, true);
+			item.textContent = "";
+			if (mailEle) {
+				item.appendChild(mailEle);	//imgメ欄
+			} else {
+				item.appendChild(dateEle);
 			}
-		}
+			item.appendChild(idEle);
+		})
 	}
 	// 出現数の表示
 	function createCounter() {
-		// return;
-		var a = document.getElementsByClassName("GM_fip_name");
-		var ids = {};
-		for (var i = 0; i < a.length; i++) {
-			var node = a[i];
-			var id = node.name;
+		if (!USE_COUNTER) return;
+		let a = document.getElementsByClassName("GM_fip_name");
+		let ids = {};
+		for (let i = 0; i < a.length; i++) {
+			let node = a[i];
+			let id = node.name;
 			if (USE_COUNTER_CURRENT) {
 				if (ids[id]) {
 					ids[id]++;
@@ -169,20 +98,15 @@
 					ids[id] = 1;
 				}
 			}
-			// var name = document.querySelectorAll(".GM_fip_name[name='" + id + "']");
-			var name = document.getElementsByName(id);
-			var span;
+			let name = document.getElementsByName(id);
+			let span;
 			if (node.childNodes[1]) {
-			// if (node.nextSibling.tagName == "SPAN") {
-				// console.log(node.childNodes.length);
-				// node.removeChild(node.childNodes[1]);
 				span = node.childNodes[1];
-				// span = node.nextSibling;
 			} else {
 				span = document.createElement("span");
+				span.classList.add("GM_fip_counter");
+				span.style.margin = "0 5px";
 				node.appendChild(span);
-				// node.parentNode.insertBefore(span, node.nextSibling);
-				span.setAttribute("class", "GM_fip_counter");
 			}
 			if (USE_COUNTER_CURRENT) {
 				span.textContent = "[" + ids[id] + "/" + name.length + "]";
@@ -191,42 +115,27 @@
 			}
 		}
 	}
-	// イベントを設定
-	function setEvent() {
-		var aa = document.getElementsByClassName("GM_fip_name");
-		for (var i = 0; i < aa.length; i++) {
-			var a = aa[i];
-			a.addEventListener("mouseover", show, true);
-			a.addEventListener("mouseout", hide, true);
-		}
-	}
 	// ポップアップを表示する
-	function show(event) {
+	function openPopup(event) {
 		clearTimeout(timer_show);
-		delpop();
-		var name = this.name;
-		timer_show = setTimeout(function() {
-			var wX;	//ポップアップ表示位置X
-			var wY;	//ポップアップ表示位置Y
-			var popup = document.createElement("div");
-			popup.setAttribute("style", "visibility: hidden;");
-			var divThread = document.createElement("div");
-			var table = document.createElement("table");
-			var tbody = document.createElement("tbody");
-			popup.appendChild(divThread);
-			popup.appendChild(table);
-			table.appendChild(tbody);
-			var tda = document.getElementsByName(name);
-			for (var i = 0; i < tda.length; i++) {
-				if (tda[i].classList.contains("GM_fip_name_thread")) {
+		delPopup();
+		timer_show = setTimeout(() => {
+			let name = this.name;
+			let popup = makePopupContainer();
+			let divThread = document.createElement("div");
+			let table = document.createElement("table");
+			let tbody = document.createElement("tbody");
+			let tda = document.getElementsByName(name);
+			for (let i = 0; i < tda.length; i++) {
+				if (tda[i].parentNode.parentNode.className === "thre") {
 					// スレ
-					var form;
+					let form;
 					if (document.querySelector(".cnw")) {
 						form = tda[i].parentNode.parentNode.cloneNode(true);
 					} else {
 						form = tda[i].parentNode.cloneNode(true);
 					}
-					for (var j = 0; j < form.childNodes.length; j++) {
+					for (let j = 0; j < form.childNodes.length; j++) {
 						// 広告
 						if (form.childNodes[j].className !== "tue") {
 							divThread.appendChild(form.childNodes[j].cloneNode(true));
@@ -237,122 +146,89 @@
 					}
 				} else {
 					// レス
-					var tr;
+					let tr;
 					if (document.querySelector(".cnw")) {
-						tr =  tda[i].parentNode.parentNode.parentNode.cloneNode(true);
+						tr = tda[i].parentNode.parentNode.parentNode.cloneNode(true);
 					} else {
 						tr = tda[i].parentNode.parentNode.cloneNode(true);
 					}
+					setQtJump(tr);
 					tbody.appendChild(tr);
 				}
 			}
-			var restable = [];
-			popup.id = "GM_fip_pop";
-			popup.setAttribute("class", "GM_fip_pop akahuku_reply_popup");
-			popup.setAttribute("__akahuku_reply_popup_index", "");
-			// popup.innerHTML = restable.join(" ");
-			popup.addEventListener("mouseover",function() {
-				clearTimeout(timer_hide);
-			}, true);
-			popup.addEventListener("mouseout",hide,true);
-			var body = document.getElementsByTagName("body");
-			body[0].appendChild(popup);
-			wX = event.clientX + 10;
-			wY = window.scrollY + event.clientY - popup.clientHeight - 10;
+			popup.appendChild(divThread);
+			popup.appendChild(table);
+			table.appendChild(tbody);
+			this.parentNode.appendChild(popup);
+			document.querySelectorAll("#GM_fip_pop .GM_fip_name").forEach((item) => {
+				item.className = ("GM_fip_name_pop");
+			})
+			let wX = event.clientX + 10;	//ポップアップ表示位置X
+			let wY = window.scrollY + event.clientY - popup.clientHeight - 10;	//ポップアップ表示位置Y
 			if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
 				wY = window.scrollY + event.clientY;
 			}
-			popup.setAttribute("style",
-				"left:" + wX + "px; top:" + wY + "px; visibility: visible;");
+			popup.style.top = wY + "px";
+			popup.style.left = wX + "px";
 		}, 100);
-	}
-	// ポップアップを消す
-	function hide() {
-		clearTimeout(timer_show);
-		clearTimeout(timer_hide);
-		timer_hide = setTimeout(delpop, 500);
-	}
-
-	function delpop() {
-		clearTimeout(timer_hide);
-		var doc_pop = document.getElementsByClassName("GM_fip_pop");
-		if ( doc_pop ) {
-			for (var i = 0; i < doc_pop.length; i++) {
-				doc_pop[i].parentNode.removeChild(doc_pop[i]);
-			}
+		//ポップアップ内レス番号クリックでジャンプ
+		function setQtJump(qt) {
+			let rsc = qt.querySelector(".rsc");
+			rsc.classList.add("qtjmp");
+			let jumpid = rsc.id;
+			rsc.removeAttribute("id");
+			rsc.addEventListener("click", () => {
+				let jumptarget = document.getElementById(jumpid).parentNode;
+				window.scroll(0, jumptarget.getBoundingClientRect().top + window.pageYOffset);
+				delPopup();
+			});
 		}
 	}
-	/*
-	 * スタイル設定
-	 */
-	function setStyle() {
-		var css = ".GM_fip_pop {" +
-		"  position: absolute;" +
-		"  z-index: 350;" +
-		"  background-color: #eeaa88 !important;"+
-		"}" +
-		// ".GM_fip_pop > form {" +
-		// "  background-color: #ffe" +
-		// "}" +
-		".GM_fip_pop > table {" +
-		"  clear: both;" +
-		"}" +
-		".GM_fip_pop > div," +
-		".GM_fip_pop > table > tbody > tr > td {" +
-		"  color: #800000;" +
-		"  font-size: 8pt !important;" +
-		"}" +
-		".GM_fip_pop > div," +
-		".GM_fip_pop > table > tbody > tr > td > blockquote {" +
-		"  margin-top: 0px !important;" +
-		"  margin-bottom: 0px !important;" +
-		"}" +
-		".GM_fip_name {" +
-		"  color: #F00;" +
-		// "  font-family: monospace;" +
-		"}" +
-		".GM_fip_counter {" +
-		"  margin: 0 0.3em;" +
-		// "  color: #cc1105;" +
-		"}";
-		if (typeof GM_addStyle != "undefined") {
-			GM_addStyle(css);
-		} else if (typeof addStyle != "undefined") {
-			addStyle(css);
-		} else {
-			var heads = document.getElementsByTagName("head");
-			if (heads.length > 0) {
-				var node = document.createElement("style");
-				node.type = "text/css";
-				node.appendChild(document.createTextNode(css));
-				heads[0].appendChild(node);
+
+	function makePopupContainer() {
+		let container = document.createElement("div");
+		container.id = "GM_fip_pop";
+		container.classList.add("GM_fip_pop");
+		container.style.position = "absolute";
+		container.style.zIndex = 350;
+		container.style.backgroundColor = "#eeaa88";
+		container.style.fontSize = "0.85em";
+		container.addEventListener("mouseover",() => {
+			clearTimeout(timer_hide);
+		}, true);
+		container.addEventListener("mouseout",closePopup,true);
+
+		return container;
+	}
+	// ポップアップを消す
+	function closePopup() {
+		clearTimeout(timer_show);
+		clearTimeout(timer_hide);
+		timer_hide = setTimeout(delPopup, 300);
+	}
+
+	function delPopup() {
+		clearTimeout(timer_hide);
+		let doc_pop = document.getElementsByClassName("GM_fip_pop");
+		if ( doc_pop ) {
+			for (let i = 0; i < doc_pop.length; i++) {
+				doc_pop[i].remove();
 			}
 		}
 	}
 	// 続きを読むで追加されるレスを監視
 	function observeInserted() {
-		observeReloadStatus();
-		var target = document.querySelector(".thre") ?
-			document.querySelector(".thre") :
-			document.querySelector("html > body > form[action]:not([enctype])");
-		var timer_reload;
-		var observer = new MutationObserver(function(mutations) {
-			mutations.forEach(function(mutation) {
-				delpop();
-				var nodes = mutation.addedNodes;
-				for (var i = 0; i < nodes.length; i++) {
-					// console.log(nodes[i]);
-					if (
-						nodes[i].tagName == "TABLE" &&
-						nodes[i].id !== "akahuku_bottom_container"
-					) {
-						if (isIDIPThread) {
-							setClassAndNameRes(nodes[i].childNodes[0].childNodes[0].childNodes);
-						}
-						clearTimeout(timer_reload);
-						timer_reload = setTimeout(rel, 50);
-					}
-				}
+		let target = document.querySelector(".thre");
+		let timer_reload;
+		let observer = new MutationObserver(function(mutations) {
+			mutations.forEach((mutation) => {
+				if (!mutation.addedNodes.length) return;
+				let nodes = mutation.addedNodes[0];
+				if (isIDIPThread && nodes.tagName == "TABLE" && nodes.id !== "akahuku_bottom_container") {
+					setClassAndNameRes(nodes);
+					clearTimeout(timer_reload);
+					timer_reload = setTimeout(rel, 50);
+				};
 			});
 		});
 		observer.observe(target, { childList: true });
@@ -362,21 +238,6 @@
 				setClassAndNameRes();
 			}
 			createCounter();
-			setEvent();
 		}
 	}
-	// 赤福のリロード状態を監視
-	function observeReloadStatus() {
-		var target = document.getElementById("akahuku_reload_status");
-		if (!target) {
-			return;
-		}
-		var observer = new MutationObserver(function(mutations) {
-			mutations.forEach(function(mutation) {
-				delpop();
-			});
-		});
-		observer.observe(target, { childList: true });
-	}
-	console.log('Parsing '+saba+': '+((new Date()).getTime()-Start) +'msec');//log parsing time
 })();
