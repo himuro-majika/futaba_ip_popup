@@ -18,23 +18,27 @@
 	let saba = location.host.replace(".2chan.net","") + location.pathname.replace("futaba.htm","");
 	let timer_show, timer_hide;
 	let isIDIPThread = false;
+	let isImg = false;
 
 	init();
 	console.log(scriptName + " Parsing " + saba + ": " + ((new Date()).getTime() - Start) + "msec");//log parsing time
 
 	function init() {
+		checkIsImg();
 		checkThreadMail();
 		setClassAndNameThread();
-		setClassAndNameRes();
 		createCounter();
 		observeInserted();
 	}
 
+	//img鯖
+	function checkIsImg() {
+		isImg = document.querySelector(".cnm") === null;
+	}
+
 	// ID表示・IP表示スレかどうか
 	function checkThreadMail() {
-		let mail = document.querySelector(".cnm") ? 
-			document.querySelector(".cnm a") :
-			document.querySelector("html > body > form font > b > a");
+		let mail = !isImg ? document.querySelector(".cnm a") : document.querySelector(".thre .cnw a");
 		isIDIPThread = mail !== null && mail.href.match(/^mailto:i[dp]/i) !== null;
 	}
 
@@ -56,9 +60,10 @@
 		if(!node.length) return;
 
 		node.forEach((item) => {
-			let matchText = item.firstChild.nodeValue.match(/(.+)(I[DP]:\S+)/);
+			let matchText = item.textContent.match(/(.+)(I[DP]:\S+)/);
 			if (!matchText) return;
 			let dateEle = document.createTextNode(matchText[1]);
+			let mailEle = item.querySelector("a");
 			let idText = matchText[2];
 			let idEle = document.createElement("a");
 			idEle.textContent = idText;
@@ -67,8 +72,12 @@
 			idEle.style.color = "#F00";
 			idEle.addEventListener("mouseover", openPopup, true);
 			idEle.addEventListener("mouseout", closePopup, true);
-			item.innerText = ""
-			item.appendChild(dateEle);
+			item.textContent = "";
+			if (mailEle) {
+				item.appendChild(mailEle);	//imgメ欄
+			} else {
+				item.appendChild(dateEle);
+			}
 			item.appendChild(idEle);
 		})
 	}
@@ -137,7 +146,7 @@
 					// レス
 					let tr;
 					if (document.querySelector(".cnw")) {
-						tr =  tda[i].parentNode.parentNode.parentNode.cloneNode(true);
+						tr = tda[i].parentNode.parentNode.parentNode.cloneNode(true);
 					} else {
 						tr = tda[i].parentNode.parentNode.cloneNode(true);
 					}
