@@ -62,6 +62,7 @@
 		if(!node.length) return;
 
 		node.forEach((item) => {
+			if (item.querySelector(".GM_fip_name")) return;
 			let matchText = item.textContent.match(/(.+)(I[DP]:\S+)/);
 			if (!matchText) return;
 			let dateEle = document.createTextNode(matchText[1]);
@@ -86,7 +87,7 @@
 	// 出現数の表示
 	function createCounter() {
 		if (!USE_COUNTER) return;
-		let a = document.getElementsByClassName("GM_fip_name");
+		let a = document.querySelectorAll(".thre .GM_fip_name");
 		let ids = {};
 		for (let i = 0; i < a.length; i++) {
 			let node = a[i];
@@ -98,7 +99,7 @@
 					ids[id] = 1;
 				}
 			}
-			let name = document.getElementsByName(id);
+			let name = document.querySelectorAll(".thre [name='" + id + "']");
 			let span;
 			if (node.childNodes[1]) {
 				span = node.childNodes[1];
@@ -125,7 +126,7 @@
 			let divThread = document.createElement("div");
 			let table = document.createElement("table");
 			let tbody = document.createElement("tbody");
-			let tda = document.getElementsByName(name);
+			let tda = document.querySelectorAll(".thre [name='" + name + "']");
 			for (let i = 0; i < tda.length; i++) {
 				if (tda[i].parentNode.parentNode.className === "thre") {
 					// スレ
@@ -156,10 +157,22 @@
 					tbody.appendChild(tr);
 				}
 			}
+			table.appendChild(tbody);
 			popup.appendChild(divThread);
 			popup.appendChild(table);
-			table.appendChild(tbody);
-			this.parentNode.appendChild(popup);
+			if (checkAkahukuEnabled()) {
+				let bq = popup.querySelectorAll("blockquote");
+				bq.forEach(q => {
+					let td = q.parentNode;
+					let gtdiv = document.createElement("div");
+					gtdiv.classList.add("akahuku_popup_content_blockquote");
+					gtdiv.innerHTML = q.innerHTML;
+					q.remove();
+					td.appendChild(gtdiv);
+				})
+			}
+			// this.parentNode.appendChild(popup);
+			document.querySelector("html body").appendChild(popup);
 			document.querySelectorAll("#GM_fip_pop .GM_fip_name").forEach((item) => {
 				item.className = ("GM_fip_name_pop");
 			})
@@ -224,11 +237,11 @@
 			mutations.forEach((mutation) => {
 				if (!mutation.addedNodes.length) return;
 				let nodes = mutation.addedNodes[0];
-				if (isIDIPThread && nodes.tagName == "TABLE" && nodes.id !== "akahuku_bottom_container") {
+				if (nodes.tagName == "TABLE" && nodes.id !== "akahuku_bottom_container") {
 					setClassAndNameRes(nodes);
 					clearTimeout(timer_reload);
 					timer_reload = setTimeout(rel, 50);
-				};
+				}
 			});
 		});
 		observer.observe(target, { childList: true });
@@ -240,4 +253,9 @@
 			createCounter();
 		}
 	}
+
+	function checkAkahukuEnabled() {
+		return document.getElementById("akahuku_postform") != null
+	}
+
 })();
