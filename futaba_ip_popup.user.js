@@ -165,6 +165,7 @@
 				bq.forEach(q => {
 					let td = q.parentNode;
 					let gtdiv = document.createElement("div");
+					gtdiv.style.maxWidth = "800px";
 					gtdiv.classList.add("akahuku_popup_content_blockquote");
 					gtdiv.innerHTML = q.innerHTML;
 					q.remove();
@@ -176,10 +177,10 @@
 			document.querySelectorAll("#GM_fip_pop .GM_fip_name").forEach((item) => {
 				item.className = ("GM_fip_name_pop");
 			})
-			let wX = event.clientX + 10;	//ポップアップ表示位置X
-			let wY = window.scrollY + event.clientY - popup.clientHeight - 10;	//ポップアップ表示位置Y
+			let wX = this.getBoundingClientRect().left + window.scrollX;	//ポップアップ表示位置X
+			let wY = this.getBoundingClientRect().top + window.scrollY - popup.clientHeight;	//ポップアップ表示位置Y
 			if ( wY < 0 ) {	//ポップアップが上に見きれる時は下に表示
-				wY = window.scrollY + event.clientY;
+				wY = this.getBoundingClientRect().bottom + window.scrollY
 			}
 			popup.style.top = wY + "px";
 			popup.style.left = wX + "px";
