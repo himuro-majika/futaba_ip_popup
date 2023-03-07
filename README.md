@@ -8,6 +8,10 @@ Chromeの場合、[Tampermonkey](https://chrome.google.com/webstore/detail/tampe
 Opera(ver.15+)の場合、[Tampermonkey](https://addons.opera.com/extensions/details/tampermonkey-beta/)を先にインスールしてからスクリプトをインストールして下さい  
 
 ## 更新履歴
+* v1.3.1 2023-03-07
+	- 特定条件でカウンターの重複が発生する問題を修正
+	- futaba reverse res searchと併用した場合の問題を修正
+	- ポップアップの表示スタイルを変更
 * v1.3.0 2021-07-05
 	- ポップアップ内のレス番号をクリックして該当レスにジャンプする機能を追加
 	- img鯖上のIDIP表示スレに反応しない問題を修正
